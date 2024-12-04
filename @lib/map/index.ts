@@ -1,14 +1,31 @@
-import { DirectionMarker } from "../vectors";
+import { coords, DirectionalDirectionMarker, DirectionMarker, updateCoords } from "../vectors";
 
 export class Map2D {
     grid: any[][];
     size: [number, number];
 
-    constructor(size: [number, number], grid?: any[][]) {
-        this.size = size
+    constructor(grid?: any[][]|string, size?: [number, number], delimiter="") {
+        
         if (grid) {
-            this.grid = grid
+            if (typeof grid === "string") {
+                this.grid = grid.split("\n").map(x => x.split(delimiter))
+            } else {
+                this.grid = grid
+            }
+            
+            if (typeof size === "undefined") {
+                this.size = [this.grid[0].length, this.grid.length]
+            } else {
+                this.size = size
+            }
         } else {
+            if (typeof size === "undefined") {
+                throw Error("Size not defined on empty grid")
+                return
+            } else {
+                this.size = size
+            }
+
             let grid = []
             for (let index = 0; index < this.size[1]; index++) {
                 let row = []
@@ -31,35 +48,21 @@ export class Map2D {
         }
     }
 
-    getNextElement(coords: [number, number], direction: DirectionMarker) {
-        switch (direction) {
-            case DirectionMarker.NORTH:
-                if (coords[1] - 1 >= 0) {
-                    console.log(this.getElement(coords[0], coords[1] - 1)"")
-
-                    return this.getElement(coords[0], coords[1] - 1)
-                }
-                return
-            case DirectionMarker.WEST:
-                if (coords[0] - 1 >= 0) {
-                    return this.getElement(coords[0] - 1, coords[1])
-                }
-                return
-            case DirectionMarker.SOUTH:
-                if (coords[1] + 1 < this.size[1]) {
-                    return this.getElement(coords[0], coords[1] + 1)
-                }
-                return
-            case DirectionMarker.EAST:
-                if (coords[0] + 1 < this.size[0]) {
-                    return this.getElement(coords[0] + 1, coords[1])
-                }
-                return
+    getNextElement(coords: [number, number], direction: DirectionMarker|DirectionalDirectionMarker, distance?: number) {
+        distance = distance ?? 1;
+        let newCoords: coords = updateCoords(coords, direction, distance)
+        if (!this.isInGrid(newCoords)) {
+            throw new Error("New coordinates are outside of the grid");
         }
+        return this.getElement(updateCoords(coords, direction, distance))
     }
 
     setElement(coords: [number, number], value: any) {
         this.grid[coords[1]][coords[0]] = value
+    }
+
+    isInGrid(coords: coords): boolean {
+        return !(coords[0] < 0 || coords[0] >= this.size[0] || coords[1] < 0 || coords[1] >= this.size[1])
     }
 
     fillGrid(value: any|any[][]) {
@@ -78,5 +81,27 @@ export class Map2D {
                 }
             }
         }
+    }
+
+    getPossibleDirections(coords: coords, lengthToSearch?: number, getDiagonals?:boolean): (DirectionMarker|DirectionalDirectionMarker)[] {
+        lengthToSearch = lengthToSearch ?? 1;
+        getDiagonals = getDiagonals ?? true;
+
+        let availableDirections: (DirectionMarker|DirectionalDirectionMarker)[] = []
+        for (const [key, value] of Object.entries(DirectionMarker)) {
+            if (this.isInGrid(updateCoords(coords, value, lengthToSearch))) {
+                availableDirections.push(value)
+            }
+        }
+        
+        if (getDiagonals) {
+            for (const [key, value] of Object.entries(DirectionalDirectionMarker)) {
+                if (this.isInGrid(updateCoords(coords, value, lengthToSearch))) {
+                    availableDirections.push(value)
+                }
+            }
+        }
+
+        return availableDirections
     }
 }

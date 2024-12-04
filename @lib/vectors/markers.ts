@@ -1,33 +1,42 @@
 import { coords } from "."
 
 export enum DirectionMarker {
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST
+    NORTH = "N",
+    EAST = "E",
+    SOUTH = "S",
+    WEST = "W"
 }
 
 export enum DirectionalDirectionMarker {
-    NORTHWEST,
-    SOUTHWEST,
-    SOUTHEAST,
-    NORTHEAST
+    NORTHWEST = "NW",
+    SOUTHWEST = "SW",
+    SOUTHEAST = "SE",
+    NORTHEAST = "NE"
 }
 
-export function updateCoords(coords: [number, number], direction: DirectionMarker|DirectionalDirectionMarker): [number, number] {
+export function updateCoords(coords: [number, number], direction: DirectionMarker|DirectionalDirectionMarker, distance?:number): [number, number] {
+    distance = distance ?? 1;
     switch(direction) {
         case DirectionMarker.NORTH:
-            return [coords[0], coords[1] - 1]
+            return [coords[0], coords[1] - distance]
         case DirectionMarker.EAST:
-            return [coords[0] + 1, coords[1]]
+            return [coords[0] + distance, coords[1]]
         case DirectionMarker.SOUTH:
-            return [coords[0], coords[1] + 1]
+            return [coords[0], coords[1] + distance]
         case DirectionMarker.WEST:
-            return [coords[0] - 1, coords[1]]
+            return [coords[0] - distance, coords[1]]
+        case DirectionalDirectionMarker.NORTHEAST:
+            return [coords[0] + distance, coords[1] - distance]
+        case DirectionalDirectionMarker.NORTHWEST:
+            return [coords[0] - distance, coords[1] - distance]
+        case DirectionalDirectionMarker.SOUTHEAST:
+            return [coords[0] + distance, coords[1] + distance]
+        case DirectionalDirectionMarker.SOUTHWEST:
+            return [coords[0] - distance, coords[1] + distance]
     }
 }
 
-export function getOppositeDirectionMarker(dir: DirectionMarker) {
+export function getOppositeDirectionMarker(dir: DirectionMarker|DirectionalDirectionMarker) {
     switch(dir) {
         case DirectionMarker.NORTH:
             return DirectionMarker.SOUTH
@@ -37,6 +46,14 @@ export function getOppositeDirectionMarker(dir: DirectionMarker) {
             return DirectionMarker.NORTH
         case DirectionMarker.WEST:
             return DirectionMarker.EAST
+        case DirectionalDirectionMarker.NORTHEAST:
+            return DirectionalDirectionMarker.SOUTHWEST
+        case DirectionalDirectionMarker.NORTHWEST:
+            return DirectionalDirectionMarker.SOUTHEAST
+        case DirectionalDirectionMarker.SOUTHEAST:
+            return DirectionalDirectionMarker.NORTHWEST
+        case DirectionalDirectionMarker.SOUTHWEST:
+            return DirectionalDirectionMarker.NORTHEAST
     }
 }
 
