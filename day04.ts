@@ -39,3 +39,8 @@ function countCrossMASOccurences(map: Map2D) {
     }))
     console.log(cnt)
 }
+
+console.log(countXMAXoccurences(parseWordSearch(`XMAS
+XMAS
+XMAS
+XMAS`)))

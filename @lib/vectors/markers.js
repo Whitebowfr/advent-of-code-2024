@@ -1,26 +1,45 @@
 "use strict";
-exports.__esModule = true;
-exports.getMarkerDifferences = exports.getDirectionFromString = exports.getOppositeDirectionMarker = exports.updateCoords = exports.DirectionMarker = void 0;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DirectionalDirectionMarker = exports.DirectionMarker = void 0;
+exports.updateCoords = updateCoords;
+exports.getOppositeDirectionMarker = getOppositeDirectionMarker;
+exports.getDirectionFromString = getDirectionFromString;
+exports.getMarkerDifferences = getMarkerDifferences;
 var DirectionMarker;
 (function (DirectionMarker) {
-    DirectionMarker[DirectionMarker["NORTH"] = 0] = "NORTH";
-    DirectionMarker[DirectionMarker["EAST"] = 1] = "EAST";
-    DirectionMarker[DirectionMarker["SOUTH"] = 2] = "SOUTH";
-    DirectionMarker[DirectionMarker["WEST"] = 3] = "WEST";
-})(DirectionMarker = exports.DirectionMarker || (exports.DirectionMarker = {}));
-function updateCoords(coords, direction) {
+    DirectionMarker["NORTH"] = "N";
+    DirectionMarker["EAST"] = "E";
+    DirectionMarker["SOUTH"] = "S";
+    DirectionMarker["WEST"] = "W";
+})(DirectionMarker || (exports.DirectionMarker = DirectionMarker = {}));
+var DirectionalDirectionMarker;
+(function (DirectionalDirectionMarker) {
+    DirectionalDirectionMarker["NORTHWEST"] = "NW";
+    DirectionalDirectionMarker["SOUTHWEST"] = "SW";
+    DirectionalDirectionMarker["SOUTHEAST"] = "SE";
+    DirectionalDirectionMarker["NORTHEAST"] = "NE";
+})(DirectionalDirectionMarker || (exports.DirectionalDirectionMarker = DirectionalDirectionMarker = {}));
+function updateCoords(coords, direction, distance) {
+    distance = distance !== null && distance !== void 0 ? distance : 1;
     switch (direction) {
         case DirectionMarker.NORTH:
-            return [coords[0], coords[1] - 1];
+            return [coords[0], coords[1] - distance];
         case DirectionMarker.EAST:
-            return [coords[0] + 1, coords[1]];
+            return [coords[0] + distance, coords[1]];
         case DirectionMarker.SOUTH:
-            return [coords[0], coords[1] + 1];
+            return [coords[0], coords[1] + distance];
         case DirectionMarker.WEST:
-            return [coords[0] - 1, coords[1]];
+            return [coords[0] - distance, coords[1]];
+        case DirectionalDirectionMarker.NORTHEAST:
+            return [coords[0] + distance, coords[1] - distance];
+        case DirectionalDirectionMarker.NORTHWEST:
+            return [coords[0] - distance, coords[1] - distance];
+        case DirectionalDirectionMarker.SOUTHEAST:
+            return [coords[0] + distance, coords[1] + distance];
+        case DirectionalDirectionMarker.SOUTHWEST:
+            return [coords[0] - distance, coords[1] + distance];
     }
 }
-exports.updateCoords = updateCoords;
 function getOppositeDirectionMarker(dir) {
     switch (dir) {
         case DirectionMarker.NORTH:
@@ -31,9 +50,16 @@ function getOppositeDirectionMarker(dir) {
             return DirectionMarker.NORTH;
         case DirectionMarker.WEST:
             return DirectionMarker.EAST;
+        case DirectionalDirectionMarker.NORTHEAST:
+            return DirectionalDirectionMarker.SOUTHWEST;
+        case DirectionalDirectionMarker.NORTHWEST:
+            return DirectionalDirectionMarker.SOUTHEAST;
+        case DirectionalDirectionMarker.SOUTHEAST:
+            return DirectionalDirectionMarker.NORTHWEST;
+        case DirectionalDirectionMarker.SOUTHWEST:
+            return DirectionalDirectionMarker.NORTHEAST;
     }
 }
-exports.getOppositeDirectionMarker = getOppositeDirectionMarker;
 function getDirectionFromString(str) {
     switch (str) {
         case "U":
@@ -46,7 +72,6 @@ function getDirectionFromString(str) {
             return DirectionMarker.EAST;
     }
 }
-exports.getDirectionFromString = getDirectionFromString;
 function getMarkerDifferences(pointA, pointB) {
     var full = [];
     if (pointA[1] < pointB[1]) {
@@ -75,4 +100,3 @@ function getMarkerDifferences(pointA, pointB) {
     }
     return full;
 }
-exports.getMarkerDifferences = getMarkerDifferences;
